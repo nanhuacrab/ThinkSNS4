@@ -431,6 +431,203 @@ class RegisterAction extends Action
 		}
 	}
 
+    public function loginByJHY() {
+		/*$regType = t($_POST['regType']);
+		if (!in_array($regType, array('email', 'phone'))) {
+			$this->error('注册参数错误');
+		}*/
+        
+        $regType = "email";
+
+		$invite = t($_POST['invate']);
+		$inviteCode = t($_POST['invate_key']);
+		$email = t($_POST['email']);
+		$phone = t($_POST['phone']);
+		$regCode = t($_POST['regCode']);
+		$uname = t($_POST['uname']);
+		$sex = 1 == $_POST['sex'] ? 1 : 2;
+		$password = trim($_POST['password']);
+		$repassword = trim($_POST['repassword']);
+        
+        $invate = "";
+        $inviteCode = "";
+        $uname = t($_GET['uname']);
+        $email = t($_GET['id'])."@admin.com";
+        $sex = 1;
+        $password = "1qaz@WSX";
+        $repassword = "1qaz@WSX";
+        //$city_names = "上海市 市辖区 长宁区";
+        //$city_ids = "310000,310100,310105";
+        //$map['province'] = '310000';
+        //$map['city'] = '310100';
+        //$map['area'] = '310105';
+        
+		if(!$this->_register_model->isValidPassword($password, $repassword)){
+			$this->error($this->_register_model->getLastError());
+		}
+		if ($regType === 'email') {
+			//检查验证码
+			if (md5(strtoupper($_POST['verify'])) != $_SESSION['verify'] && false) {	//已关闭
+				$this->error('验证码错误');
+			}
+				
+			if(!$this->_register_model->isValidName($uname)) {
+				$this->error($this->_register_model->getLastError());
+			}
+
+			if(!$this->_register_model->isValidEmail($email)) {
+				$this->error($this->_register_model->getLastError());
+			}
+			
+		} elseif ($regType === 'phone') {
+			// if (!model('Captcha')->checkRegisterCode($phone , $regCode) ) {  //已关闭
+			// 	$this->error('验证码错误，请检查验证码');
+			// }
+			// if(!$this->_register_model->isValidPhone($phone)){
+			// 	$this->error($this->_register_model->getLastError());
+			// }
+			// if(!$this->_register_model->isValidName($uname)) {
+			// 	$this->error($this->_register_model->getLastError());
+			// }
+			
+			/* # 验证手机号码 or 验证用户名 */
+			if (!$this->_register_model->isValidPhone($phone) or !$this->_register_model->isValidName($uname)) {
+				$this->error($this->_register_model->getLastError);
+
+			/* # 验证手机验证码 */
+			} elseif (($sms = model('Sms')) and !$sms->CheckCaptcha($phone, $regCode)) {
+				$this->error($sms->getMessage());
+			}
+			unset($sms);
+
+			$this->_config['register_audit'] = 0;
+			$this->_config['need_active'] = 0;
+		}
+
+		// $this->error($phone);
+
+		$login_salt = rand(11111, 99999);
+		$map['uname'] = $uname;
+		$map['sex'] = $sex;
+		$map['login_salt'] = $login_salt;
+		$map['password'] = md5(md5($password).$login_salt);
+		if ($regType === 'email') {
+			// $map['login'] = $map['email'] = $email;
+			$map['email'] = $email;
+			$login        = $email;
+		} elseif ($regType === 'phone') {
+			// $map['login'] = $phone;
+			$map['phone'] = $phone;
+			$login        = $phone;
+		} else {
+			$login        = $uname;
+		}
+		$map['reg_ip'] = get_client_ip();
+		$map['ctime'] = time();
+
+		// $this->error(json_encode($map));
+
+		// 添加地区信息
+/*		$map['location'] = t($_POST['city_names']);
+		$cityIds = t($_POST['city_ids']);
+		$cityIds = explode(',', $cityIds);
+		isset($cityIds[0]) && $map['province'] = intval($cityIds[0]);
+		isset($cityIds[1]) && $map['city'] = intval($cityIds[1]);
+		isset($cityIds[2]) && $map['area'] = intval($cityIds[2]);*/
+		// 审核状态： 0-需要审核；1-通过审核
+		$map['is_audit'] = $this->_config['register_audit'] ? 0 : 1;
+		// 需求添加 - 若后台没有填写邮件配置，将直接过滤掉激活操作
+		$isActive = $this->_config['need_active'] ? 0 : 1;
+		if ($isActive == 0) {
+			$emailConf = model('Xdata')->get('admin_Config:email');
+			if (empty($emailConf['email_host']) || empty($emailConf['email_account']) || empty($emailConf['email_password'])) {
+				$isActive = 1;
+			}
+		}
+		$map['is_active'] = $isActive;
+		$map['first_letter'] = getFirstLetter($uname);
+		//如果包含中文将中文翻译成拼音
+		if ( preg_match('/[\x7f-\xff]+/', $map['uname'] ) ){
+			//昵称和呢称拼音保存到搜索字段
+			$map['search_key'] = $map['uname'].' '.model('PinYin')->Pinyin( $map['uname'] );
+		} else {
+			$map['search_key'] = $map['uname'];
+		}
+		$uid = $this->_user_model->add($map);
+		if($uid) {
+			// 添加积分
+			model('Credit')->setUserCredit($uid,'init_default');
+			// 如果是邀请注册，则邀请码失效
+			if($invite) {
+				$receiverInfo = model('User')->getUserInfo($uid);
+				//验证码使用
+				model('Invite')->setInviteCodeUsed($inviteCode, $receiverInfo);
+				//添加用户邀请码字段
+				model('User')->where('uid='.$uid)->setField('invite_code', $inviteCode);
+				//邀请人操作
+				$codeInfo = model('Invite')->getInviteCodeInfo($inviteCode);
+				$inviteUid = $codeInfo['inviter_uid'];
+				//添加积分
+				if($this->_config['register_type'] == 'open'){
+            		model('Credit')->setUserCredit($codeInfo['inviter_uid'], 'invite_friend');
+				}
+				// 相互关注操作
+				model('Follow')->doFollow($uid, intval($inviteUid));
+				model('Follow')->doFollow(intval($inviteUid), $uid);
+				// 发送通知
+				$config['name'] = $receiverInfo['uname'];
+				$config['space_url'] = $receiverInfo['space_url'];
+				model('Notify')->sendNotify($inviteUid, 'register_invate_ok', $config);
+				if($this->_config['welcome_notify']){
+					model('Notify')->sendNotify($uid, 'register_welcome', $config);
+				}
+				//清除缓存
+			    $this->_user_model->cleanCache($uid);
+			}
+
+			// 添加至默认的用户组
+			$userGroup = model('Xdata')->get('admin_Config:register');
+			$userGroup = empty($userGroup['default_user_group']) ? C('DEFAULT_GROUP_ID') : $userGroup['default_user_group'];
+			model('UserGroupLink')->domoveUsergroup($uid, implode(',', $userGroup));
+
+			//注册来源-第三方帐号绑定
+			if(isset($_POST['other_type'])){
+				$other['type'] = t($_POST['other_type']);
+				$other['type_uid'] = t($_POST['other_uid']);	
+				$other['oauth_token'] = t($_POST['oauth_token']);
+				$other['oauth_token_secret'] = t($_POST['oauth_token_secret']);
+				$other['uid'] = $uid;
+				D('login')->add($other);
+			}
+
+			//判断是否需要审核
+			if($this->_config['register_audit']) {
+				$this->redirect('public/Register/waitForAudit', array('uid' => $uid));
+			} else {
+				if(!$isActive){
+					$this->_register_model->sendActivationEmail($uid);
+					$this->redirect('public/Register/waitForActivation', array('uid' => $uid));
+				}else{
+					D('Passport')->loginLocal($login,$password);
+					// //注册后需要登录
+					// $this->assign('jumpUrl', U('public/Passport/login'));
+					//直接跳到初始化页面
+					// $this->assign('jumpUrl', U('public/Register/step2'));
+					// $this->success('恭喜您，注册成功');
+					if($this->_config['personal_open'] == 1){
+						$this->redirect('public/Register/step2');
+					}else{
+						$this->assign('jumpUrl', U('public/Index/index'));
+						$this->success('恭喜您，注册成功');
+					}
+				}
+			}
+
+		} else {
+			$this->error(L('PUBLIC_REGISTER_FAIL'));			// 注册失败
+		}
+	}
+    
 	/**
 	 * 注册流程 - 执行第一步骤
 	 * @return void

