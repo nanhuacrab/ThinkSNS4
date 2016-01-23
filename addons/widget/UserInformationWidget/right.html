@@ -1,7 +1,8 @@
 <div class="person-info clearfix login-status-box">
   <dl class="person-info-t clearfix">
-    <dt><a href="{$userInfo.space_url}"><img src="{$userInfo.avatar_big}" /></a><a href="{:U('public/Account/avatar')}" class="face">换头像</a></dt>
-    <dd>
+    <!--<dt><a href="{$userInfo.space_url}"><img src="{$userInfo.avatar_big}" /></a><a href="{:U('public/Account/avatar')}" class="face">换头像</a></dt>-->
+    <dt><img src="{$userInfo.avatar_big}" /></dt>
+    <dd style="display: none;">
       <div class="name"> <a href="{$userInfo.space_url}">{$userInfo.uname}</a> 
       </div>
       <div class="user-grade clearfix">
@@ -9,7 +10,7 @@
       </div>
     </dd>
   </dl>
-  <ul class="person-info-b clearfix">
+  <ul class="person-info-b clearfix" style="display: none;">
     <li><a href="{:U('public/Profile/index',array('uid'=>$userInfo[uid]))}">分享: <h6>{$userData.weibo_count|default=0}</h6></a></li>
     <li><a href="{:U('public/Profile/collection', array('tab'=>'collect','uid'=>$userInfo[uid]))}">收藏: <h6>{$userData.favorite_count|default=0}</h6></a></li>
     <li><a href="{:U('public/Profile/following', array('tab'=>'following','uid'=>$userInfo[uid]))}">关注: <h6>{$userData.following_count|default=0}</h6></a></li>
