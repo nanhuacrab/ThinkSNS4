@@ -470,11 +470,15 @@ class RegisterAction extends Action
 			if (md5(strtoupper($_POST['verify'])) != $_SESSION['verify'] && false) {	//已关闭
 				$this->error('验证码错误');
 			}
-				
+			
+            //echo $uname;
+            //die;
 			if(!$this->_register_model->isValidName($uname)) {
 				$this->error($this->_register_model->getLastError());
 			}
 
+            //echo $email;
+            //die;
 			if(!$this->_register_model->isValidEmail($email)) {
 				$this->error($this->_register_model->getLastError());
 			}

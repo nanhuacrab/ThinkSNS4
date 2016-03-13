@@ -200,10 +200,10 @@ class RegisterModel extends Model {
 		if($res) {
 			$length = get_str_length($name);
 			$res = ($length >= 2 && $length <= 10);
-			if(!$res) {
+			/*if(!$res) {
 				$this->_error = L('PUBLIC_NICKNAME_LIMIT', array('nums'=>'2-10'));			// 昵称长度必须在2-10个汉字之间
 				return false;
-			}
+			}*/
 		} else {
 			$this->_error = '仅支持中英文，数字，下划线';
 			return false;
