@@ -146,7 +146,7 @@ class App
                 throw_exception( L('_MODULE_NOT_EXIST_').' '.MODULE_NAME );
             }
         }
-
+//echo $className;
         $module =   new $className();
 
         $GLOBALS['time_run_detail']['action_instance'] = microtime(true);
@@ -159,7 +159,7 @@ class App
 
         //获取当前操作名
         $action =   ACTION_NAME;
-
+//echo $action;
         //执行当前操作
         call_user_func(array(&$module,$action));
 

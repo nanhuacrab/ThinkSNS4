@@ -1,12 +1,14 @@
 <volist name="user" id="vo">
 	<li model-node="related_li" class="mb20">
         <div class="user left">
-          <a event-node="face_card" uid="{$vo.userInfo.uid}" href="{$vo.userInfo.space_url}" title="{$vo.userInfo.uname}" class="face">
+          <!--<a event-node="face_card" uid="{$vo.userInfo.uid}" href="{$vo.userInfo.space_url}" title="{$vo.userInfo.uname}" class="face">-->
+          <a event-node="face_card" uid="{$vo.userInfo.uid}" href="javascript:void(0);" title="{$vo.userInfo.uname}" class="face">
             <img  src="{$vo.userInfo.avatar_middle}"/>
           </a>
         </div>
         <div class="user-prof left">
-          <a class="mb10 name" href="{$vo.userInfo.space_url}">{$vo.userInfo.uname}</a>
+          <!--<a class="mb10 name" href="{$vo.userInfo.space_url}">{$vo.userInfo.uname}</a>-->
+          {$vo.userInfo.uname}
           <p>
           {$vo.info.msg}
           </p>

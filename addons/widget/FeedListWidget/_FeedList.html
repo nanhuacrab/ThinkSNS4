@@ -1,6 +1,7 @@
 <php>
 $cancomment = intval(CheckPermission('core_normal','feed_comment')); 
 $canfeedshare = CheckPermission('core_normal','feed_share');
+//echo '$canfeedshare ='.$canfeedshare.'</br>';
 $canfeeddel = CheckPermission('core_normal','feed_del');
 $adminfeeddel = CheckPermission('core_admin','feed_del');
 $canfeedreport = CheckPermission('core_normal','feed_report');
@@ -11,11 +12,14 @@ $admintaskrecom = CheckPermission('vtask_admin','vtask_recommend');
   <volist name="data" id ="vl">
     <php>$cancomment_old = empty($vl['app_row_id'])  ? 0 : 1;</php>
     <dl class="feed_list" id="feed{$vl.feed_id}" model-node="feed_list">
-      <dt class="face">
+      <dt class="face" style="display: none;">
       <a href="{$vl['user_info']['space_url']}"><img src="{$vl['user_info']['avatar_middle']}" event-node="face_card" uid="{$vl['user_info']['uid']}"></a><php>if($vl['user_info']['group_icon_only']):</php><a href="javascript:;" title="{$vl['user_info']['group_icon_only']['user_group_name']}" class="group_icon_only"><img alt="{$vl['user_info']['group_icon_only']['user_group_name']}" src="{$vl['user_info']['group_icon_only']['user_group_icon_url']}" ></a><php>endif;</php>
     </dt>
+    <dt class="face" >
+    <img src="{$vl['user_info']['avatar_middle']}" />
+    </dt>
   	<dd class="content">
-      {:W('FeedManage', array('feed_id'=>$vl['feed_id'], 'feed_uid'=>$vl['user_info']['uid'], 'is_recommend'=>$vl['is_recommend']))}
+      <!--{:W('FeedManage', array('feed_id'=>$vl['feed_id'], 'feed_uid'=>$vl['user_info']['uid'], 'is_recommend'=>$vl['is_recommend']))}-->
       <em class="hover right">
             <eq name='vl.actions.delete' value='true'>
             <?php if($adminfeeddel || ($vl['user_info']['uid'] == $GLOBALS['ts']['mid'] && $canfeeddel)): ?>
@@ -24,7 +28,7 @@ $admintaskrecom = CheckPermission('vtask_admin','vtask_recommend');
             </eq>
 
             <?php if($canfeedreport && ($vl['user_info']['uid'] != $GLOBALS['ts']['mid']) ): ?>
-            <a href="javascript:;" event-node="denounce" event-args="aid={$vl.feed_id}&type=feed&uid={$vl.user_info.uid}">{:L('PUBLIC_STREAM_REPORT')}</a>&nbsp;&nbsp;
+            <!--<a href="javascript:;" event-node="denounce" event-args="aid={$vl.feed_id}&type=feed&uid={$vl.user_info.uid}">{:L('PUBLIC_STREAM_REPORT')}</a>&nbsp;&nbsp;-->
             <?php endif; ?>
       </em>
       <eq name="vl.is_del" value="0">
@@ -45,6 +49,7 @@ $admintaskrecom = CheckPermission('vtask_admin','vtask_recommend');
           </eq>
           <php>endif;</php>
 
+          <php>if ( $canfeedshare ):</php>
           <if condition=" $GLOBALS['ts']['mid'] neq 0 ">
             <php>if(in_array('repost', $weibo_premission) && $canfeedshare):</php>
             <eq name='vl.actions.repost' value='true'>
@@ -60,13 +65,14 @@ $admintaskrecom = CheckPermission('vtask_admin','vtask_recommend');
             {:W('Share',array('sid'=>$sid,'stable'=>$vl['app_row_table'],'initHTML'=>'','current_table'=>'feed','current_id'=>$vl['feed_id'],'nums'=>$vl['repost_count'],'appname'=>$vl['app'],'cancomment'=>$cancomment_old,'feed_type'=>$vl['type'],'is_repost'=>$vl['is_repost'],'enode'=>'open_share'))}
             <i class="vline">|</i>
           </if>
-
-          <eq name='vl.actions.favor' value='true'>
+          
+          <!--<eq name='vl.actions.favor' value='true'>
           {:W('Collection',array('type'=>$type,'sid'=>$vl['feed_id'],'stable'=>'feed','sapp'=>$vl['app']))}
           </eq>
-          <i class="vline">|</i>
+          <i class="vline">|</i>-->
 
           {:W('Digg',array('feed_id'=>$vl['feed_id'],'digg_count'=>$vl['digg_count'],'diggArr'=>$diggArr))}
+           <php>endif;</php>
         </span>
         <span>
           <a class="date" date="{$vl.publish_time}" href="{:U('public/Profile/feed',array('feed_id'=>$vl['feed_id'],'uid'=>$vl['uid']))}"><em>{$vl.publish_time|friendlyDate}</em><em style="display:none;">查看详情</em></a>
@@ -76,13 +82,15 @@ $admintaskrecom = CheckPermission('vtask_admin','vtask_recommend');
       <div class="infopen"><div class="trigon"></div></div>
       <div class="forward_box">
       	<div class="bdsharebuttonbox share_feedlist clearfix" data-tag="share_feedlist">
-              <a href="javascript:;" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博">新浪微博</a>
+              <!--<a href="javascript:;" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博">新浪微博</a>-->
               <a href="javascript:;" class="bds_weixin" data-cmd="weixin" title="分享到微信">微信</a>
-              <a href="javascript:;" class="bds_tqq" data-cmd="tqq" title="分享到腾讯微博">腾讯微博</a>
+              <!--<a href="javascript:;" class="bds_tqq" data-cmd="tqq" title="分享到腾讯微博">腾讯微博</a>
               <a href="javascript:;" class="bds_qzone" data-cmd="qzone" title="分享到QQ空间">QQ空间</a>
               <a href="javascript:;" class="bds_renren" data-cmd="renren" title="分享到人人网">人人网</a>
-              <a href="javascript:;" class="bds_douban" data-cmd="douban" title="分享到豆瓣网">豆瓣网</a>
+              <a href="javascript:;" class="bds_douban" data-cmd="douban" title="分享到豆瓣网">豆瓣网</a>-->
+              <!--
               {:W('Share',array('sid'=>$sid,'stable'=>$vl['app_row_table'],'initHTML'=>'','current_table'=>'feed','current_id'=>$vl['feed_id'],'nums'=>$vl['repost_count'],'appname'=>$vl['app'],'cancomment'=>$cancomment_old,'feed_type'=>$vl['type'],'is_repost'=>$vl['is_repost'], 'text'=>'我的主页', 'title'=> '分享到我的主页', 'class'=>'repost'))}
+              -->
               <a href="javascript:;" class="bds_count" data-cmd="count"></a>
         </div>
       </div>

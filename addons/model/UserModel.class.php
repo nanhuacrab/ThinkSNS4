@@ -936,7 +936,8 @@ class UserModel extends Model {
 			) ) : U ( 'public/Profile/index', array (
 					'uid' => $user ["uid"] 
 			) );
-			$user ['space_link'] = "<a href='" . $user ['space_url'] . "' target='_blank' uid='{$user['uid']}' event-node='face_card'>" . $user ['uname'] . "</a>";
+			//$user ['space_link'] = "<a href='" . $user ['space_url'] . "' target='_blank' uid='{$user['uid']}' event-node='face_card'>" . $user ['uname'] . "</a>";
+            $user ['space_link'] = $user ['uname'];
 			$user ['space_link_no'] = "<a href='" . $user ['space_url'] . "' title='" . $user ['uname'] . "' target='_blank'>" . $user ['uname'] . "</a>";
 			// 用户勋章
 			$user ['medals'] = model ( 'Medal' )->getMedalByUid ( $user ['uid'] );

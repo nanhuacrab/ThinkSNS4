@@ -7,7 +7,7 @@
 <div id="body-bg">
 <php>$act = strtolower(APP_NAME).'_'.strtolower(MODULE_NAME); $navClass[$act]='current';$aClass[$act]='app';</php>
 <php>$act = strtolower(APP_NAME); $navClass[$act]='current';$aClass[$act]='app';</php>
-<div id="header" name="header"> {* 未登录时 *}
+<div id="header" name="header" style="display: none;"> {* 未登录时 *}
   <nosession name="mid">
     <div class="header-wrap">
       <div class="head-bd"> 
@@ -334,7 +334,7 @@
   </session>
 </div>
 <!--二级导航-->
-<div class="navigation-down">
+<div class="navigation-down" style="display: none">
   <volist name='site_top_nav' id='st'>
   <div class="nav-down-menu" id="sec-nav-{$st.navi_id}" _nav="sec-nav-{$st.navi_id}">
     <div class="navigation-down-inner">
@@ -354,7 +354,7 @@
   if(!$mid && in_array(APP_NAME.'/'.MODULE_NAME,$show_register_tips)){ </php>
 <php>$registerConf = model('Xdata')->get('admin_Config:register');</php>
 <!--未登录前-->
-<div class="login-no-bg">
+<div class="login-no-bg" style="display: none;" >
   <div class="login-no-box clearfix">
     <div class="login-reg right">
       <php>if($registerConf['register_type'] == 'open'){</php>

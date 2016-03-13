@@ -14,7 +14,7 @@
           {:Addons::hook('home_index_left_top')}
           <div> 
             <!--发布框--分享--文章--微吧-->
-            <div class="diy-share">
+            <div class="diy-share" style="display: none;">
               <ul class="diy-share-cont" id="medz-share-box" <eq name="user.is_fixed" value="1">style="display:none;"</eq>>
                 <li> <a href="javascript:void(0);" class="sharing"> <i class="i-sharing"></i><span>分享</span> </a>
                   <p>快速分享文字、图片、视频</p>
@@ -128,11 +128,13 @@
                 <ul>
                   <li class="{$nowClass['all']}"><span><a href="{:U('public/Index/index',array('type'=>'all'))}">全部</a></span></li>
                   <li class="{$nowClass['following']}"><span><a href="{:U('public/Index/index',array('type'=>'following'))}">关注</a></span></li>
-                  <if condition="$isChannelOpen"><li class="{$nowClass['channel']}"><span><a href="{:U('public/Index/index',array('type'=>'channel'))}">频道</a></span></li></if>
+                  <if condition="$isChannelOpen">
+                    <!--<li class="{$nowClass['channel']}"><span><a href="{:U('public/Index/index',array('type'=>'channel'))}">频道</a></span></li>-->
+                  </if>
                   <?php if($weibaIfOpen) { ?>
-                  <li class="{$nowClass['weiba']}"><span><a href="{:U('public/Index/index',array('type'=>'weiba'))}">帖子</a></span></li>
+                  <!--<li class="{$nowClass['weiba']}"><span><a href="{:U('public/Index/index',array('type'=>'weiba'))}">帖子</a></span></li>-->
                   <?php } ?>
-                  <li class="{$nowClass['recommend']}"><span><a href="{:U('public/Index/index',array('type'=>'recommend'))}">推荐</a></span></li>
+                  <!--<li class="{$nowClass['recommend']}"><span><a href="{:U('public/Index/index',array('type'=>'recommend'))}">推荐</a></span></li>-->
                 </ul>
               </div>
               <!--<div class="feed-nav clearfix"> 
